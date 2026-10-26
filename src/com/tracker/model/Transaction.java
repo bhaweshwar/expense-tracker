@@ -8,6 +8,19 @@ public class Transaction {
     private double amount;
     private TransactionType type;
 
+    // Overloaded constructor for loading existing records from a file
+    public Transaction(int id, String description, double amount, TransactionType type) {
+        this.id = id;
+        this.description = description;
+        this.amount = amount;
+        this.type = type;
+        
+        // Ensure the static counter stays ahead of the highest loaded ID
+        if (id >= idCounter) {
+            idCounter = id + 1;
+        }
+    }
+
     public Transaction(String description, double amount, TransactionType type) {
         this.id = idCounter++;
         this.description = description;

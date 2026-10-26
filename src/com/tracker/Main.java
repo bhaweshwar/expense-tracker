@@ -3,16 +3,23 @@ package com.tracker;
 import com.tracker.model.TransactionType;
 import com.tracker.repository.TransactionRepository;
 import com.tracker.service.ExpenseService;
+import com.tracker.storage.FileStorageManager;
+
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         TransactionRepository repository = new TransactionRepository();
         ExpenseService service = new ExpenseService(repository);
+        FileStorageManager storageManager = new FileStorageManager();
         Scanner scanner = new Scanner(System.in);
-        boolean running = true;
-
+        
         System.out.println("Starting Terminal Expense Tracker...");
+        
+        // Load data into repository before opening menu
+        storageManager.loadAll(repository); 
+        
+        boolean running = true;
 
         while (running) {
             System.out.println("\n========== MAIN MENU ==========");
@@ -54,7 +61,9 @@ public class Main {
                     break;
                 case 6:
                     running = false;
-                    System.out.println("Saving and exiting... Goodbye!");
+                    System.out.println("Saving records to database...");
+                    storageManager.saveAll(service.listAllTransactions());
+                    System.out.println("Save complete. Goodbye!");
                     break;
                 default:
                     System.out.println("Invalid choice. Please select 1-6.");
@@ -63,7 +72,6 @@ public class Main {
         scanner.close();
     }
 
-    // Helper method to keep the switch statement clean
     private static void processNewTransaction(Scanner scanner, ExpenseService service, TransactionType type) {
         System.out.print("Enter description: ");
         String desc = scanner.nextLine();
